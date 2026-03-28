@@ -167,3 +167,23 @@ ul {
 
 .site-header { background: transparent; padding: 10px 0; }
 .site-header h1 { margin: 0; font-size: 1.25rem; color: var(--text); }
+
+/* Helper text and validation */
+.helper-text {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin-top: 6px;
+}
+
+input:invalid {
+  border-color: #ef4444; /* red-500 */
+  box-shadow: 0 0 0 3px rgba(239,68,68,0.08);
+}
+
+input:focus:invalid {
+  box-shadow: 0 0 0 3px rgba(239,68,68,0.14);
+}
+
+.helper-text + input:focus {
+  /* keep helper visible spacing consistent */
+}
