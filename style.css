@@ -1,19 +1,45 @@
+:root {
+  --bg: #f4f6f8;
+  --surface: #ffffff;
+  --text: #111827;
+  --muted: #6b7280;
+  --brand: #2563eb;
+  --brand-dark: #1d4ed8;
+  --header: #1f2937;
+  --nav: #374151;
+  --radius: 6px;
+}
+
+html, body {
+  height: 100%;
+}
+
 body {
-  font-family: Arial, sans-serif;
-  background-color: #f4f6f8;
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
   margin: 0;
   padding: 0;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+/* Layout container for centering content */
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
 header {
-  background: #1f2937;
+  background: var(--header);
   color: white;
-  padding: 15px;
+  padding: 15px 10px;
   text-align: center;
 }
 
 nav {
-  background: #374151;
+  background: var(--nav);
   padding: 10px;
   text-align: center;
 }
@@ -24,40 +50,81 @@ nav a {
   text-decoration: none;
 }
 
+nav a:focus,
+nav a:hover {
+  text-decoration: underline;
+}
+
 main {
-  padding: 20px;
+  padding: 20px 10px;
 }
 
 form {
-  background: white;
+  background: var(--surface);
   padding: 20px;
-  max-width: 400px;
-  border-radius: 6px;
+  max-width: 540px;
+  border-radius: var(--radius);
+  margin: 20px auto;
+  box-shadow: 0 1px 3px rgba(16,24,40,0.06), 0 1px 2px rgba(16,24,40,0.04);
 }
 
 label {
   display: block;
   margin-top: 10px;
+  color: var(--muted);
 }
 
 input, textarea, button {
   width: 100%;
   padding: 8px;
   margin-top: 5px;
+  border-radius: 4px;
+  border: 1px solid #e5e7eb;
+  box-sizing: border-box;
+}
+
+input:focus, textarea:focus, button:focus {
+  outline: none;
+}
+
+/* Accessible focus-visible styles */
+:focus-visible {
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.18);
+  border-color: var(--brand);
 }
 
 button {
   margin-top: 15px;
-  background: #2563eb;
+  background: var(--brand);
   color: white;
   border: none;
   cursor: pointer;
+  transition: background-color 160ms ease, transform 80ms ease;
 }
 
 button:hover {
-  background: #1d4ed8;
+  background: var(--brand-dark);
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+button[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 ul {
   margin-top: 20px;
+}
+
+/* Small screens tweaks */
+@media (max-width: 480px) {
+  .container, form { padding: 12px; }
+  nav a { display: inline-block; margin: 6px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
 }
