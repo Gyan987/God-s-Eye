@@ -1,19 +1,40 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>God's Eye</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h2>Report Lost Item</h2>
+  <a class="skip-link" href="#main">Skip to content</a>
 
-<form id="lostForm">
-  <input type="text" id="itemName" placeholder="Item Name" required>
-  <input type="text" id="lostPlace" placeholder="Lost Place" required>
-  <input type="date" id="lostDate" required>
-  <button type="submit">Submit Lost Item</button>
-</form>
+  <header class="site-header">
+    <div class="container">
+      <h1>God's Eye</h1>
+    </div>
+  </header>
 
-<script src="app.js"></script>
+  <main id="main" class="container" role="main">
+
+    <h2>Report Lost Item</h2>
+
+    <form id="lostForm" aria-label="Report lost item">
+      <label for="itemName" class="sr-only">Item Name</label>
+      <input type="text" id="itemName" placeholder="Item Name" required>
+
+      <label for="lostPlace" class="sr-only">Lost Place</label>
+      <input type="text" id="lostPlace" placeholder="Lost Place" required>
+
+      <label for="lostDate" class="sr-only">Date lost</label>
+      <input type="date" id="lostDate" required>
+
+      <button type="submit">Submit Lost Item</button>
+    </form>
+
+  </main>
+
+  <script src="app.js"></script>
 </body>
 </html>
