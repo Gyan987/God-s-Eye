@@ -10,12 +10,10 @@
   <body>
     <header class="site-header">
       <div class="container">
-        <h1>Report Lost Item</h1>
+        <h1 class="big-title">GOD'S EYE</h1>
         <nav>
           <a href="index.html">Home</a>
           <a href="found.html">Report Found</a>
-          <a href="models.html">3D Models</a>
-          <a href="gods-eye-app/frontend/index.html">React App</a>
         </nav>
       </div>
     </header>
@@ -24,7 +22,26 @@
       <div id="formStatus" role="status" aria-live="polite" class="sr-only"></div>
       <form id="lostForm" aria-label="Report lost item">
         <label for="itemName" class="sr-only">Item Name</label>
-        <input name="itemName" type="text" id="itemName" placeholder="Item Name" required minlength="2" autofocus>
+        <input name="itemName" type="text" id="itemName" placeholder="Item Name" aria-required="true" required minlength="2" autofocus>
+
+        <label for="category" class="sr-only">Category</label>
+        <select name="category" id="category">
+          <option value="">Category (optional)</option>
+          <option>Wallet</option>
+          <option>Phone</option>
+          <option>Keys</option>
+          <option>Bag</option>
+          <option>Other</option>
+        </select>
+
+        <label for="color" class="sr-only">Color</label>
+        <input name="color" type="text" id="color" placeholder="Color (e.g. black)">
+
+        <label for="brand" class="sr-only">Brand</label>
+        <input name="brand" type="text" id="brand" placeholder="Brand (optional)">
+
+        <label for="serial" class="sr-only">Serial</label>
+        <input name="serial" type="text" id="serial" placeholder="Serial / ID (optional)">
 
         <label for="description" class="sr-only">Description</label>
         <textarea name="description" id="description" placeholder="Description (optional)" rows="3"></textarea>
@@ -43,7 +60,23 @@
 
       <section aria-label="Reported lost items">
         <h3 class="sr-only">Reported lost items</h3>
-        <ul id="lostList" class="helper-text" aria-live="polite"></ul>
+        <div class="card">
+          <table id="lostTable">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Category</th>
+                <th>Color</th>
+                <th>Brand</th>
+                <th>Place</th>
+                <th>Date</th>
+                <th>Contact</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="lostTbody"></tbody>
+          </table>
+        </div>
       </section>
     </main>
 
