@@ -99,3 +99,36 @@ if (!localStorage.getItem('reports')) {
 }
 
 renderFeed();
+
+// Hook for found form (simple local upload)
+const foundForm = document.getElementById('foundForm');
+if (foundForm) {
+  const imgInput = document.getElementById('foundImage');
+  const preview = document.getElementById('foundPreview');
+  const saveBtn = document.getElementById('saveFound');
+
+  let foundDataUrl = '';
+  if (imgInput) {
+    imgInput.addEventListener('change', (e)=>{
+      const f = e.target.files && e.target.files[0];
+      if (!f) return;
+      const reader = new FileReader();
+      reader.onload = ()=>{ foundDataUrl = reader.result; preview.innerHTML = '<img src="'+foundDataUrl+'" style="width:180px;border-radius:8px;">'; };
+      reader.readAsDataURL(f);
+    });
+  }
+
+  if (saveBtn) {
+    saveBtn.addEventListener('click', ()=>{
+      const item = {
+        type: 'found',
+        name: (document.getElementById('foundDesc')||{}).value?.split('\n')[0] || 'Found Item',
+        description: (document.getElementById('foundDesc')||{}).value || '',
+        place: (document.getElementById('foundPlace')||{}).value || '',
+        date: (document.getElementById('foundDate')||{}).value || '',
+        image: foundDataUrl || ''
+      };
+      const arr = loadReports(); arr.unshift(item); saveReports(arr); alert('Found item saved locally'); renderFeed(searchInput && searchInput.value);
+    });
+  }
+}
