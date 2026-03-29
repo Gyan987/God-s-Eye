@@ -1,27 +1,51 @@
-<form id="lostForm">
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Report Lost Item — God's Eye</title>
+    <meta name="description" content="Report lost items to God's Eye (top-level static page).">
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container">
+        <h1>Report Lost Item</h1>
+        <nav>
+          <a href="index.html">Home</a>
+          <a href="found.html">Report Found</a>
+          <a href="gods-eye-app/frontend/index.html">React App</a>
+        </nav>
+      </div>
+    </header>
 
-  <label>Item Name:</label>
-  <input type="text" id="itemName" required>
+    <main id="main" class="container" role="main">
+      <div id="formStatus" role="status" aria-live="polite" class="sr-only"></div>
+      <form id="lostForm" aria-label="Report lost item">
+        <label for="itemName" class="sr-only">Item Name</label>
+        <input name="itemName" type="text" id="itemName" placeholder="Item Name" required minlength="2" autofocus>
 
-  <label>Description:</label>
-  <textarea id="description" required></textarea>
+        <label for="description" class="sr-only">Description</label>
+        <textarea name="description" id="description" placeholder="Description (optional)" rows="3"></textarea>
 
-  <label>Location Lost:</label>
-  <input type="text" id="lostPlace" required>
+        <label for="lostPlace" class="sr-only">Location Lost</label>
+        <input name="lostPlace" type="text" id="lostPlace" placeholder="Location lost" required>
 
-  <label>Date:</label>
-  <input type="date" id="lostDate" required>
+        <label for="lostDate" class="sr-only">Date</label>
+        <input name="lostDate" type="date" id="lostDate" required>
 
-  <label>Contact Info:</label>
-  <input type="text" id="contact" required>
+        <label for="contact" class="sr-only">Contact</label>
+        <input name="contact" type="text" id="contact" placeholder="Contact (optional)">
 
-  <button type="submit">Submit Lost Item</button>
+        <button type="submit">Submit Lost Item</button>
+      </form>
 
-</form>
+      <section aria-label="Reported lost items">
+        <h3 class="sr-only">Reported lost items</h3>
+        <ul id="lostList" class="helper-text" aria-live="polite"></ul>
+      </section>
+    </main>
 
-<h3>Lost Items</h3>
-<ul id="lostList"></ul>
-
-<script src="app.js"></script>
-</body>
+    <script src="app.js"></script>
+  </body>
 </html>
