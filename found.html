@@ -19,8 +19,24 @@
     </header>
 
     <main class="container" role="main">
-      <p class="helper-text">This is a minimal page for reporting found items. If you'd like, I can wire this to localStorage like the lost form or integrate it into the React frontend.</p>
-      <a href="lost.html">Go see reported lost items</a>
+      <h2>Report Found Item</h2>
+      <form id="foundForm">
+        <label for="foundImage" class="sr-only">Upload photo</label>
+        <input type="file" id="foundImage" accept="image/*">
+
+        <label for="foundPlace" class="sr-only">Found location</label>
+        <input type="text" id="foundPlace" placeholder="Found location">
+
+        <label for="foundDate" class="sr-only">Found date</label>
+        <input type="date" id="foundDate">
+
+        <label for="foundDesc" class="sr-only">Description</label>
+        <textarea id="foundDesc" rows="3" placeholder="Description (optional)"></textarea>
+
+        <button id="saveFound" type="button">Save Found Item</button>
+      </form>
+
+      <div id="foundPreview" style="margin-top:12px" class="helper-text"></div>
     </main>
   </body>
 </html>
