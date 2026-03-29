@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>3D Model Index — God's Eye</title>
+    <meta name="description" content="Browse a small index of 3D models to help describe lost items visually.">
+    <link rel="stylesheet" href="style.css">
+    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container">
+        <h1>3D Model Index</h1>
+        <nav>
+          <a href="index.html">Home</a>
+          <a href="lost.html">Report Lost</a>
+          <a href="found.html">Report Found</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <p class="helper-text">Use these models to quickly pick a similar-looking item when reporting. Rotate and zoom each model.</p>
+
+      <section class="model-grid">
+        <article class="model-card card">
+          <model-viewer src="https://modelviewer.dev/shared-assets/models/Astronaut.glb" alt="Astronaut" camera-controls auto-rotate exposure="1"></model-viewer>
+          <h4>Astronaut Toy</h4>
+          <p>Small vinyl astronaut figurine. Good for identifying toy-like items.</p>
+          <div>
+            <span class="badge">toy</span>
+            <span class="badge">figurine</span>
+          </div>
+        </article>
+
+        <article class="model-card card">
+          <model-viewer src="https://modelviewer.dev/shared-assets/models/RobotExpressive.glb" alt="Robot" camera-controls auto-rotate exposure="1"></model-viewer>
+          <h4>Robot Figure</h4>
+          <p>Small robot figure with visible joints and contrasting colors.</p>
+          <div>
+            <span class="badge">toy</span>
+            <span class="badge">robot</span>
+          </div>
+        </article>
+
+        <article class="model-card card">
+          <model-viewer src="https://modelviewer.dev/shared-assets/models/Chair.glb" alt="Chair" camera-controls auto-rotate exposure="1"></model-viewer>
+          <h4>Modern Chair</h4>
+          <p>Simple chair model — useful for furniture-like items.</p>
+          <div>
+            <span class="badge">furniture</span>
+            <span class="badge">chair</span>
+          </div>
+        </article>
+      </section>
+
+      <p class="helper-text">Want more models or upload support? I can add a simple uploader and tagging system to match items by appearance.</p>
+    </main>
+  </body>
+</html>
