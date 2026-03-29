@@ -20,90 +20,65 @@
       <nav>
         <a href="lost.html">Report Lost</a>
         <a href="found.html">Report Found</a>
-      </nav>
-    </div>
-  </header>
+      <!doctype html>
+      <html lang="en">
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width,initial-scale=1">
+          <meta name="description" content="GOD'S EYE – Lost & Found Intelligence Network">
+          <title>GOD'S EYE – Lost & Found Intelligence Network</title>
+          <link rel="preconnect" href="https://fonts.googleapis.com">
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+          <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+          <link rel="stylesheet" href="style.css">
+        </head>
+        <body>
 
-  <section class="hero">
-    <div class="container">
-      <h2>Find what matters — faster.</h2>
-      <p>Report lost items with detailed descriptions and search the table of reports quickly.</p>
-      <a class="cta" href="lost.html">Report an Item</a>
-    </div>
-  </section>
+          <a class="skip-link" href="#main">Skip to content</a>
 
-  <main id="main" class="container" role="main">
+          <header class="site-header">
+            <div class="container">
+              <h1 class="big-title">GOD'S EYE</h1>
+              <nav>
+                <a href="lost.html">Report Lost</a>
+                <a href="found.html">Report Found</a>
+              </nav>
+            </div>
+          </header>
 
-    <h2>Report Lost Item</h2>
-    <div id="formStatus" role="status" aria-live="polite" class="sr-only"></div>
+          <section class="hero">
+            <div class="container">
+              <h2>Lost & Found Intelligence Network</h2>
+              <p>Nothing is truly lost when GOD'S EYE is watching. Browse recent reports, search, and report items.</p>
+              <a class="cta" href="lost.html">Report an Item</a>
+            </div>
+          </section>
 
-    <form id="lostForm" aria-label="Report lost item">
-      <label for="itemName" class="sr-only">Item Name</label>
-      <input name="itemName" type="text" id="itemName" placeholder="Item Name" aria-describedby="itemNameHelp" aria-required="true" required minlength="2" autofocus>
-      <div id="itemNameHelp" class="helper-text">Example: "Black leather wallet" — be specific.</div>
+          <main id="main" class="container" role="main">
 
-      <label for="category" class="sr-only">Category</label>
-      <select name="category" id="category">
-        <option value="">Category (optional)</option>
-        <option>Wallet</option>
-        <option>Phone</option>
-        <option>Keys</option>
-        <option>Bag</option>
-        <option>Other</option>
-      </select>
+            <div style="display:flex;gap:12px;align-items:center;margin-bottom:14px;">
+              <input id="globalSearch" placeholder="Search items, locations, colors..." style="flex:1;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);background:rgba(255,255,255,0.02);color:var(--text)">
+              <button id="exportCsv">Export CSV</button>
+            </div>
 
-      <label for="color" class="sr-only">Color</label>
-      <input name="color" type="text" id="color" placeholder="Color (e.g. black)" aria-describedby="colorHelp">
-      <div id="colorHelp" class="helper-text">Primary color helps search.</div>
+            <section aria-label="Recent feed">
+              <div id="feedList">
+                <!-- feed cards rendered by JS -->
+              </div>
+            </section>
 
-      <label for="brand" class="sr-only">Brand</label>
-      <input name="brand" type="text" id="brand" placeholder="Brand (optional)">
+            <div style="height:20px"></div>
 
-      <label for="serial" class="sr-only">Serial / Identifier</label>
-      <input name="serial" type="text" id="serial" placeholder="Serial number or unique ID (optional)">
+          </main>
 
-      <label for="lostPlace" class="sr-only">Lost Place</label>
-      <input name="lostPlace" type="text" id="lostPlace" placeholder="Lost Place" aria-describedby="lostPlaceHelp" aria-required="true" required>
-      <div id="lostPlaceHelp" class="helper-text">Where you last remember seeing it (campus, cafe, bus stop).</div>
+          <nav class="bottom-nav" role="navigation" aria-label="Main navigation">
+            <a href="index.html" class="active">Home</a>
+            <a href="map.html">Map</a>
+            <a href="lost.html">Report</a>
+            <a href="messages.html">Messages</a>
+            <a href="profile.html">Profile</a>
+          </nav>
 
-      <label for="lostDate" class="sr-only">Date lost</label>
-      <input name="lostDate" type="date" id="lostDate" aria-describedby="lostDateHelp" aria-required="true" required>
-      <div id="lostDateHelp" class="helper-text">If unknown, pick an approximate date.</div>
-
-      <label for="description" class="sr-only">Description</label>
-      <textarea name="description" id="description" placeholder="More details (optional)" aria-describedby="descriptionHelp" rows="3"></textarea>
-      <div id="descriptionHelp" class="helper-text">Add distinguishing details (color, brand, unique marks).</div>
-
-      <label for="contact" class="sr-only">Contact</label>
-      <input name="contact" type="text" id="contact" placeholder="Your contact (email or phone, optional)" aria-describedby="contactHelp">
-      <div id="contactHelp" class="helper-text">Optional — used only to help return found items.</div>
-
-      <button type="submit">Submit Lost Item</button>
-    </form>
-
-    <section aria-label="Reported lost items">
-      <h3 class="sr-only">Reported lost items</h3>
-      <div class="card">
-        <table id="lostTable">
-          <thead>
-            <tr>
-              <th>Item</th>
-              <th>Category</th>
-              <th>Color</th>
-              <th>Brand</th>
-              <th>Place</th>
-              <th>Date</th>
-              <th>Contact</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="lostTbody"></tbody>
-        </table>
-      </div>
-    </section>
-
-  </main>
-
-  <script src="app.js"></script>
-</body>
-</html>
+          <script src="app.js"></script>
+        </body>
+      </html>
