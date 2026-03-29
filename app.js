@@ -132,3 +132,74 @@ if (foundForm) {
     });
   }
 }
+
+// Lost form handling and table rendering (for lost.html)
+function renderLostTable() {
+  const tbody = document.getElementById('lostTbody');
+  if (!tbody) return;
+  const reports = loadReports();
+  tbody.innerHTML = '';
+
+  reports.forEach((r, idx) => {
+    if (r.type !== 'lost') return;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${escapeHtml(r.name || '')}</td>
+      <td>${escapeHtml(r.category || '')}</td>
+      <td>${escapeHtml(r.color || '')}</td>
+      <td>${escapeHtml(r.brand || '')}</td>
+      <td>${escapeHtml(r.place || '')}</td>
+      <td>${escapeHtml(r.date || '')}</td>
+      <td>${escapeHtml(r.contact || '')}</td>
+      <td><button class="action-btn" data-idx="${idx}">Delete</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // attach delete handlers
+  tbody.querySelectorAll('button[data-idx]').forEach(btn => {
+    btn.addEventListener('click', function () {
+      const i = Number(this.getAttribute('data-idx'));
+      let arr = loadReports();
+      if (i >= 0 && i < arr.length) {
+        arr.splice(i, 1);
+        saveReports(arr);
+        renderLostTable();
+        renderFeed();
+      }
+    });
+  });
+}
+
+const lostForm = document.getElementById('lostForm');
+const formStatus = document.getElementById('formStatus');
+if (lostForm) {
+  lostForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    const item = {
+      type: 'lost',
+      name: (document.getElementById('itemName') || {}).value || '',
+      category: (document.getElementById('category') || {}).value || '',
+      color: (document.getElementById('color') || {}).value || '',
+      brand: (document.getElementById('brand') || {}).value || '',
+      serial: (document.getElementById('serial') || {}).value || '',
+      description: (document.getElementById('description') || {}).value || '',
+      place: (document.getElementById('lostPlace') || {}).value || '',
+      date: (document.getElementById('lostDate') || {}).value || '',
+      contact: (document.getElementById('contact') || {}).value || ''
+    };
+    const arr = loadReports();
+    arr.unshift(item);
+    saveReports(arr);
+    if (formStatus) {
+      formStatus.textContent = 'Lost report saved locally.';
+      setTimeout(()=>{ formStatus.textContent = ''; }, 2500);
+    }
+    lostForm.reset();
+    renderLostTable();
+    renderFeed();
+  });
+
+  // render existing on page load
+  renderLostTable();
+}
