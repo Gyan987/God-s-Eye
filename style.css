@@ -232,3 +232,22 @@ input:focus:invalid {
 .helper-text + input:focus {
   /* keep helper visible spacing consistent */
 }
+
+/* Feed & UI extras */
+.feed-card { display:flex; gap:14px; align-items:center; padding:12px; border-radius:12px; background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); box-shadow: var(--card-glow); transition: transform .12s ease; }
+.feed-card:hover { transform: translateY(-6px); }
+.feed-image { width:110px; height:78px; border-radius:8px; object-fit:cover; border:1px solid rgba(255,255,255,0.04); }
+.feed-details { flex:1 }
+.meta { color:var(--muted); font-size:0.85rem }
+.match-badge { display:inline-block; padding:6px 8px; border-radius:8px; background: linear-gradient(90deg,var(--accent-b),var(--accent-a)); color:#021019; font-weight:700; margin-left:8px }
+
+/* Bottom navigation */
+.bottom-nav { position:fixed; left:50%; transform:translateX(-50%); bottom:18px; background: rgba(255,255,255,0.03); padding:8px 18px; border-radius:40px; display:flex; gap:18px; box-shadow: 0 8px 30px rgba(0,0,0,0.6); z-index:999; }
+.bottom-nav a { color:var(--muted); text-decoration:none; font-size:0.95rem; display:flex; gap:6px; align-items:center }
+.bottom-nav a.active { color: var(--accent-c); text-shadow: 0 6px 24px rgba(0,255,156,0.06) }
+
+@media (max-width:600px) {
+  .feed-image { width:84px; height:64px }
+  .big-title { font-size:1.9rem }
+  .bottom-nav { gap:12px }
+}
