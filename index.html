@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Report and search for lost items on God's Eye — simple, privacy-friendly local reporting.">
   <title>God's Eye</title>
   <link rel="stylesheet" href="style.css">
 </head>
@@ -19,22 +20,36 @@
   <main id="main" class="container" role="main">
 
     <h2>Report Lost Item</h2>
+    <div id="formStatus" role="status" aria-live="polite" class="sr-only"></div>
 
     <form id="lostForm" aria-label="Report lost item">
       <label for="itemName" class="sr-only">Item Name</label>
-      <input type="text" id="itemName" placeholder="Item Name" aria-describedby="itemNameHelp" aria-required="true" required minlength="2" autofocus>
+      <input name="itemName" type="text" id="itemName" placeholder="Item Name" aria-describedby="itemNameHelp" aria-required="true" required minlength="2" autofocus>
       <div id="itemNameHelp" class="helper-text">Example: "Black leather wallet" — be specific.</div>
 
       <label for="lostPlace" class="sr-only">Lost Place</label>
-      <input type="text" id="lostPlace" placeholder="Lost Place" aria-describedby="lostPlaceHelp" aria-required="true" required>
+      <input name="lostPlace" type="text" id="lostPlace" placeholder="Lost Place" aria-describedby="lostPlaceHelp" aria-required="true" required>
       <div id="lostPlaceHelp" class="helper-text">Where you last remember seeing it (campus, cafe, bus stop).</div>
 
       <label for="lostDate" class="sr-only">Date lost</label>
-      <input type="date" id="lostDate" aria-describedby="lostDateHelp" aria-required="true" required>
+      <input name="lostDate" type="date" id="lostDate" aria-describedby="lostDateHelp" aria-required="true" required>
       <div id="lostDateHelp" class="helper-text">If unknown, pick an approximate date.</div>
+
+      <label for="description" class="sr-only">Description</label>
+      <textarea name="description" id="description" placeholder="More details (optional)" aria-describedby="descriptionHelp" rows="3"></textarea>
+      <div id="descriptionHelp" class="helper-text">Add distinguishing details (color, brand, unique marks).</div>
+
+      <label for="contact" class="sr-only">Contact</label>
+      <input name="contact" type="text" id="contact" placeholder="Your contact (email or phone, optional)" aria-describedby="contactHelp">
+      <div id="contactHelp" class="helper-text">Optional — used only to help return found items.</div>
 
       <button type="submit">Submit Lost Item</button>
     </form>
+
+    <section aria-label="Reported lost items">
+      <h3 class="sr-only">Reported lost items</h3>
+      <ul id="lostList" class="helper-text" aria-live="polite"></ul>
+    </section>
 
   </main>
 
