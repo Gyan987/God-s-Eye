@@ -4,7 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Report and search for lost items on God's Eye — simple, privacy-friendly local reporting.">
-  <title>God's Eye</title>
+  <title>GOD'S EYE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -13,12 +16,10 @@
 
   <header class="site-header">
     <div class="container">
-      <h1>God's Eye</h1>
+      <h1 class="big-title">GOD'S EYE</h1>
       <nav>
-        <a href="gods-eye-app/frontend/index.html">Open React App</a>
         <a href="lost.html">Report Lost</a>
         <a href="found.html">Report Found</a>
-        <a href="models.html">3D Models</a>
       </nav>
     </div>
   </header>
@@ -26,8 +27,8 @@
   <section class="hero">
     <div class="container">
       <h2>Find what matters — faster.</h2>
-      <p>God's Eye helps you report and find lost items. Explore our curated 3D model index to quickly identify items by appearance.</p>
-      <a class="cta" href="models.html">Browse 3D Models</a>
+      <p>Report lost items with detailed descriptions and search the table of reports quickly.</p>
+      <a class="cta" href="lost.html">Report an Item</a>
     </div>
   </section>
 
@@ -40,6 +41,26 @@
       <label for="itemName" class="sr-only">Item Name</label>
       <input name="itemName" type="text" id="itemName" placeholder="Item Name" aria-describedby="itemNameHelp" aria-required="true" required minlength="2" autofocus>
       <div id="itemNameHelp" class="helper-text">Example: "Black leather wallet" — be specific.</div>
+
+      <label for="category" class="sr-only">Category</label>
+      <select name="category" id="category">
+        <option value="">Category (optional)</option>
+        <option>Wallet</option>
+        <option>Phone</option>
+        <option>Keys</option>
+        <option>Bag</option>
+        <option>Other</option>
+      </select>
+
+      <label for="color" class="sr-only">Color</label>
+      <input name="color" type="text" id="color" placeholder="Color (e.g. black)" aria-describedby="colorHelp">
+      <div id="colorHelp" class="helper-text">Primary color helps search.</div>
+
+      <label for="brand" class="sr-only">Brand</label>
+      <input name="brand" type="text" id="brand" placeholder="Brand (optional)">
+
+      <label for="serial" class="sr-only">Serial / Identifier</label>
+      <input name="serial" type="text" id="serial" placeholder="Serial number or unique ID (optional)">
 
       <label for="lostPlace" class="sr-only">Lost Place</label>
       <input name="lostPlace" type="text" id="lostPlace" placeholder="Lost Place" aria-describedby="lostPlaceHelp" aria-required="true" required>
@@ -62,7 +83,23 @@
 
     <section aria-label="Reported lost items">
       <h3 class="sr-only">Reported lost items</h3>
-      <ul id="lostList" class="helper-text" aria-live="polite"></ul>
+      <div class="card">
+        <table id="lostTable">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Category</th>
+              <th>Color</th>
+              <th>Brand</th>
+              <th>Place</th>
+              <th>Date</th>
+              <th>Contact</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="lostTbody"></tbody>
+        </table>
+      </div>
     </section>
 
   </main>
