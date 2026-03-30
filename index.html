@@ -1,72 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="Report and search for lost items on God's Eye — simple, privacy-friendly local reporting.">
-  <title>GOD'S EYE</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="GOD'S EYE – Lost & Found Intelligence Network. Report and search for lost items locally.">
+    <meta name="theme-color" content="#111827">
+    <title>GOD'S EYE – Lost & Found Intelligence Network</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
 
-  <a class="skip-link" href="#main">Skip to content</a>
+    <a class="skip-link" href="#main">Skip to content</a>
 
-  <header class="site-header">
-    <div class="container">
-      <h1 class="big-title">GOD'S EYE</h1>
-      <nav>
-        <a href="lost.html">Report Lost</a>
-        <a href="found.html">Report Found</a>
-      <!doctype html>
-      <html lang="en">
-        <head>
-          <meta charset="utf-8">
-          <meta name="viewport" content="width=device-width,initial-scale=1">
-          <meta name="description" content="GOD'S EYE – Lost & Found Intelligence Network">
-          <title>GOD'S EYE – Lost & Found Intelligence Network</title>
-          <link rel="preconnect" href="https://fonts.googleapis.com">
-          <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-          <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-          <link rel="stylesheet" href="style.css">
-        </head>
-        <body>
+    <header class="site-header">
+      <div class="container">
+        <h1 class="big-title">GOD'S EYE</h1>
+        <nav aria-label="Top navigation">
+          <a href="lost.html">Report Lost</a>
+          <a href="found.html">Report Found</a>
+        </nav>
+      </div>
+    </header>
 
-          <section class="hero">
-            <div class="container">
-              <h2>Lost & Found Intelligence Network</h2>
-              <p>Nothing is truly lost when GOD'S EYE is watching. Browse recent reports, search, and report items.</p>
-              <a class="cta" href="lost.html">Report an Item</a>
-            </div>
-          </section>
+    <section class="hero">
+      <div class="container">
+        <h2>Lost & Found Intelligence Network</h2>
+        <p>Nothing is truly lost when GOD'S EYE is watching. Browse recent reports, search, and report items.</p>
+        <a class="cta" href="lost.html">Report an Item</a>
+      </div>
+    </section>
 
-          <main id="main" class="container" role="main">
+    <main id="main" class="container" role="main">
 
-            <div style="display:flex;gap:12px;align-items:center;margin-bottom:14px;">
-              <input id="globalSearch" placeholder="Search items, locations, colors..." style="flex:1;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);background:rgba(255,255,255,0.02);color:var(--text)">
-              <button id="exportCsv">Export CSV</button>
-            </div>
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:14px;">
+        <label for="globalSearch" class="sr-only">Search items</label>
+        <input id="globalSearch" placeholder="Search items, locations, colors..." style="flex:1;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);background:rgba(255,255,255,0.02);color:var(--text)">
+        <button id="exportCsv">Export CSV</button>
+      </div>
 
-            <section aria-label="Recent feed">
-              <div id="feedList">
-                <!-- feed cards rendered by JS -->
-              </div>
-            </section>
+      <section aria-label="Recent feed">
+        <div id="feedList">
+          <!-- feed cards rendered by JS -->
+        </div>
+      </section>
 
-            <div style="height:20px"></div>
+      <div style="height:20px"></div>
 
-          </main>
+    </main>
 
-          <nav class="bottom-nav" role="navigation" aria-label="Main navigation">
-            <a href="index.html" class="active">Home</a>
-            <a href="map.html">Map</a>
-            <a href="lost.html">Report</a>
-            <a href="messages.html">Messages</a>
-            <a href="profile.html">Profile</a>
-          </nav>
+    <nav class="bottom-nav" role="navigation" aria-label="Main navigation">
+      <a href="index.html" class="active">Home</a>
+      <a href="map.html">Map</a>
+      <a href="lost.html">Report</a>
+      <a href="messages.html">Messages</a>
+      <a href="profile.html">Profile</a>
+    </nav>
 
-          <script src="app.js"></script>
-        </body>
-      </html>
+    <script src="app.js"></script>
+  </body>
+</html>
