@@ -5,6 +5,7 @@ const AdminPage = () => {
   const [summary, setSummary] = useState(null);
   const [users, setUsers] = useState([]);
   const [message, setMessage] = useState('');
+  const [banningId, setBanningId] = useState(null);
 
   const load = async () => {
     const [sumRes, usersRes] = await Promise.all([client.get('/admin/dashboard'), client.get('/admin/users')]);
@@ -17,9 +18,17 @@ const AdminPage = () => {
   }, []);
 
   const banUser = async (userId) => {
-    await client.put(`/admin/ban-user/${userId}`);
-    setMessage('User banned');
-    load();
+    if (!window.confirm('Are you sure you want to ban this user?')) return;
+    setBanningId(userId);
+    try {
+      await client.put(`/admin/ban-user/${userId}`);
+      setMessage('User banned');
+    } catch (err) {
+      setMessage('Failed to ban user');
+    } finally {
+      setBanningId(null);
+      load();
+    }
   };
 
   return (
@@ -45,8 +54,14 @@ const AdminPage = () => {
                 <p className="text-sm opacity-70">{user.email} {user.banned ? '(banned)' : ''}</p>
               </div>
               {!user.banned && (
-                <button className="rounded-lg border border-red-500 px-3 py-2 text-sm font-semibold text-red-600" type="button" onClick={() => banUser(user._id)}>
-                  Ban User
+                <button
+                  aria-label={`Ban ${user.name}`}
+                  className="rounded-lg border border-red-500 px-3 py-2 text-sm font-semibold text-red-600"
+                  type="button"
+                  onClick={() => banUser(user._id)}
+                  disabled={banningId === user._id}
+                >
+                  {banningId === user._id ? 'Banning...' : 'Ban User'}
                 </button>
               )}
             </div>
