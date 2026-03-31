@@ -191,6 +191,21 @@ model-viewer { width: 100%; height: 240px; border-radius: 8px; background: linea
 
 .badge { display:inline-block; padding:4px 8px; border-radius:999px; background: rgba(255,255,255,0.04); color:var(--muted); font-size:0.8rem; margin-right:6px; }
 
+/* Human-made badge: small pill to indicate handcrafted work */
+.human-made {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+  border: 1px solid rgba(255,255,255,0.04);
+  box-shadow: 0 6px 18px rgba(2,6,23,0.6);
+}
+
+.human-made[title] { cursor: help }
+
 /* Table styles */
 #lostTable {
   width: 100%;
