@@ -40,9 +40,17 @@
 
     <main id="main" class="container" role="main">
 
-      <div style="display:flex;gap:12px;align-items:center;margin-bottom:14px;">
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:14px;">
         <label for="globalSearch" class="sr-only">Search items</label>
-        <input id="globalSearch" placeholder="Search items, locations, colors..." style="flex:1;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);background:rgba(255,255,255,0.02);color:var(--text)">
+        <input id="globalSearch" placeholder="Search items, locations, colors..." style="flex:1;min-width:220px;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);background:rgba(255,255,255,0.02);color:var(--text)">
+        <label for="feedSort" class="sr-only">Sort feed</label>
+        <select id="feedSort" aria-label="Sort feed" style="width:auto;min-width:170px;padding:10px;border-radius:12px;">
+          <option value="latest">Sort: Latest First</option>
+          <option value="oldest">Sort: Oldest First</option>
+          <option value="name-asc">Sort: Name A-Z</option>
+          <option value="name-desc">Sort: Name Z-A</option>
+        </select>
+        <span id="feedStats" class="helper-text" aria-live="polite"></span>
         <button id="exportCsv">Export CSV</button>
       </div>
 
@@ -50,6 +58,7 @@
         <div id="feedList">
           <!-- feed cards rendered by JS -->
         </div>
+        <p id="feedEmpty" class="helper-text" style="display:none;margin-top:12px;">No matching items found.</p>
       </section>
 
       <div style="height:20px"></div>
