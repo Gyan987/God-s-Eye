@@ -3,6 +3,10 @@
   --accent-a: #00E5FF; /* electric blue */
   --accent-b: #8A2BE2; /* neon purple */
   --accent-c: #00FF9C; /* cyber green */
+  --brand: #00E5FF;
+  --accent1: #00E5FF;
+  --accent2: #8A2BE2;
+  --card-bg: rgba(255,255,255,0.03);
   --glass: rgba(255,255,255,0.035);
   --card-glow: 0 10px 40px rgba(0,229,255,0.06);
   --text: #F4F7FA;
@@ -256,6 +260,18 @@ input:focus:invalid {
 .meta { color:var(--muted); font-size:0.85rem }
 .match-badge { display:inline-block; padding:6px 8px; border-radius:8px; background: linear-gradient(90deg,var(--accent-b),var(--accent-a)); color:#021019; font-weight:700; margin-left:8px }
 
+#feedStats {
+  margin-top: 0;
+  white-space: nowrap;
+}
+
+#feedEmpty {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.02);
+  border: 1px dashed rgba(255,255,255,0.08);
+}
+
 /* Bottom navigation */
 .bottom-nav { position:fixed; left:50%; transform:translateX(-50%); bottom:18px; background: rgba(255,255,255,0.03); padding:8px 18px; border-radius:40px; display:flex; gap:18px; box-shadow: 0 8px 30px rgba(0,0,0,0.6); z-index:999; }
 .bottom-nav a { color:var(--muted); text-decoration:none; font-size:0.95rem; display:flex; gap:6px; align-items:center }
@@ -265,4 +281,5 @@ input:focus:invalid {
   .feed-image { width:84px; height:64px }
   .big-title { font-size:1.9rem }
   .bottom-nav { gap:12px }
+  #feedStats { width: 100%; }
 }
