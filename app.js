@@ -4,9 +4,18 @@ console.log('GOD\'S EYE — app.js loaded');
 const feedRoot = document.getElementById('feedList');
 const searchInput = document.getElementById('globalSearch');
 const exportBtn = document.getElementById('exportCsv');
+const sortSelect = document.getElementById('feedSort');
+const feedStats = document.getElementById('feedStats');
+const feedEmpty = document.getElementById('feedEmpty');
 
 function loadReports() {
-  return JSON.parse(localStorage.getItem('reports') || '[]');
+  try {
+    const parsed = JSON.parse(localStorage.getItem('reports') || '[]');
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (err) {
+    console.warn('Invalid reports data in localStorage, resetting.', err);
+    return [];
+  }
 }
 
 function saveReports(r) {
@@ -23,15 +32,43 @@ function mockMatchScore(item) {
   return Math.min(99, Math.round(score));
 }
 
+function formatDateValue(v) {
+  if (!v) return null;
+  const t = Date.parse(v);
+  return Number.isNaN(t) ? null : t;
+}
+
+function applySort(reports, mode) {
+  const data = reports.slice();
+  if (mode === 'oldest') {
+    data.sort((a, b) => (formatDateValue(a.date) || 0) - (formatDateValue(b.date) || 0));
+    return data;
+  }
+  if (mode === 'name-asc') {
+    data.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+    return data;
+  }
+  if (mode === 'name-desc') {
+    data.sort((a, b) => (b.name || '').localeCompare(a.name || ''));
+    return data;
+  }
+  data.sort((a, b) => (formatDateValue(b.date) || 0) - (formatDateValue(a.date) || 0));
+  return data;
+}
+
 function renderFeed(filter) {
   if (!feedRoot) return;
   const reports = loadReports();
+  const sortMode = sortSelect ? sortSelect.value : 'latest';
+  const sortedReports = applySort(reports, sortMode);
   feedRoot.innerHTML = '';
   const q = (filter||'').toLowerCase().trim();
+  let visibleCount = 0;
 
-  reports.forEach((r, idx) => {
+  sortedReports.forEach((r) => {
     const text = `${r.name} ${r.place} ${r.color || ''} ${r.brand || ''} ${r.description || ''}`.toLowerCase();
     if (q && !text.includes(q)) return;
+    visibleCount += 1;
 
     const card = document.createElement('article');
     card.className = 'feed-card';
@@ -60,7 +97,15 @@ function renderFeed(filter) {
 
     viewBtn.addEventListener('click', ()=> alert('View details:\n'+(r.description||'No details')));
     contactBtn.addEventListener('click', ()=> alert('Start secure chat (placeholder)'));
-    del.addEventListener('click', ()=>{ let arr=loadReports(); arr.splice(idx,1); saveReports(arr); renderFeed(searchInput && searchInput.value); });
+    del.addEventListener('click', ()=>{
+      let arr = loadReports();
+      const removeIndex = arr.findIndex((x) => JSON.stringify(x) === JSON.stringify(r));
+      if (removeIndex >= 0) {
+        arr.splice(removeIndex, 1);
+        saveReports(arr);
+        renderFeed(searchInput && searchInput.value);
+      }
+    });
 
     actions.appendChild(viewBtn); actions.appendChild(contactBtn); actions.appendChild(del);
 
@@ -69,11 +114,23 @@ function renderFeed(filter) {
     card.appendChild(img); card.appendChild(details);
     feedRoot.appendChild(card);
   });
+
+  if (feedStats) {
+    feedStats.textContent = `${visibleCount} of ${reports.length} items`;
+  }
+
+  if (feedEmpty) {
+    feedEmpty.style.display = visibleCount ? 'none' : 'block';
+  }
 }
 
 // Wire search
 if (searchInput) {
   searchInput.addEventListener('input', (e)=> renderFeed(e.target.value));
+}
+
+if (sortSelect) {
+  sortSelect.addEventListener('change', () => renderFeed(searchInput && searchInput.value));
 }
 
 // Export CSV
@@ -86,6 +143,22 @@ if (exportBtn) {
     const blob = new Blob([csv], {type:'text/csv'});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a'); a.href=url; a.download='gods-eye-reports.csv'; a.click(); URL.revokeObjectURL(url);
+  });
+}
+
+const clearBtn = document.createElement('button');
+clearBtn.id = 'clearReports';
+clearBtn.textContent = 'Clear Local Data';
+clearBtn.style.width = 'auto';
+clearBtn.style.marginTop = '0';
+clearBtn.className = 'action-btn';
+if (exportBtn && exportBtn.parentElement) {
+  exportBtn.parentElement.appendChild(clearBtn);
+  clearBtn.addEventListener('click', () => {
+    if (!confirm('Delete all locally stored reports?')) return;
+    saveReports([]);
+    renderFeed(searchInput && searchInput.value);
+    renderLostTable();
   });
 }
 
