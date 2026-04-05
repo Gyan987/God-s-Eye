@@ -2,8 +2,10 @@ const LostItem = require('../models/LostItem');
 const FoundItem = require('../models/FoundItem');
 const Notification = require('../models/Notification');
 const { uploadImageBuffer } = require('../utils/cloudinary');
-const { getPossibleMatches } = require('../utils/matcher');
+const { getPossibleMatches, calculateMatchQuality } = require('../utils/matcher');
 const sendEmail = require('../utils/sendEmail');
+const { sendSuccess, sendError, sendPaginated } = require('../utils/apiResponse');
+const logger = require('../utils/logger');
 
 const withImage = async (req) => {
   if (!req.file) return '';
@@ -33,29 +35,47 @@ const reportLostItem = async (req, res, next) => {
 
     if (matches.length) {
       await LostItem.findByIdAndUpdate(lostItem._id, { status: 'matched' });
+      
+      // Create enhanced notification with match quality info
+      const topMatches = matches.slice(0, 3);
+      const matchQuality = calculateMatchQuality(matches[0].score);
+      
       await Notification.create({
         user_id: req.user._id,
-        title: 'Possible Match Found',
-        message: `We found ${matches.length} possible matches for ${lostItem.item_name}.`,
+        title: 'Possible Match Found!',
+        message: `We found ${matches.length} possible matches (${ matchQuality}) for your lost "${lostItem.item_name}". Check them out!`,
         item_type: 'lost',
-        item_id: lostItem._id
+        item_id: lostItem._id,
+        match_count: matches.length,
+        match_quality: matchQuality
       });
 
       if (payload.contact_email) {
         await sendEmail({
           to: payload.contact_email,
-          subject: 'GOD\'S EYE: Possible Match Found',
-          text: `A possible match was found for your lost item: ${lostItem.item_name}.`
+          subject: `GOD'S EYE: ${matches.length} Possible Match(es) Found`,
+          text: `A possible match was found for your lost item: ${lostItem.item_name}. Open the app to view details!`
         });
       }
+
+      logger.info('Lost item reported with matches', {
+        itemId: lostItem._id,
+        matchCount: matches.length,
+        userId: req.user._id
+      });
     }
 
-    return res.status(201).json({
-      message: matches.length ? 'Possible Match Found' : 'Lost item reported successfully',
+    return sendSuccess(res, {
       item: lostItem,
-      matches
-    });
+      matches: matches.map(m => ({
+        ...m.found.toObject(),
+        matchScore: m.score,
+        matchQuality: calculateMatchQuality(m.score),
+        matchDetails: m.matchDetails
+      }))
+    }, matches.length > 0 ? 'Lost item reported! Possible matches found.' : 'Lost item reported successfully', 201);
   } catch (error) {
+    logger.error('Error reporting lost item', { userId: req.user._id, error: error.message });
     return next(error);
   }
 };
@@ -78,43 +98,69 @@ const reportFoundItem = async (req, res, next) => {
       status: { $ne: 'returned' }
     }).limit(200);
 
-    const matches = candidateLostItems
-      .map((lost) => ({
-        found: lost,
-        score:
-          lost.category === foundItem.category &&
-          new Date(foundItem.date_found).toDateString() === new Date(lost.date_lost).toDateString()
-            ? 60
-            : 45
-      }))
-      .slice(0, 5);
+    const matches = getPossibleMatches(foundItem, candidateLostItems)
+      .map(m => ({
+        ...m.found.toObject(),
+        matchScore: m.score,
+        matchQuality: calculateMatchQuality(m.score),
+        matchDetails: m.matchDetails
+      }));
 
     if (matches.length) {
       await FoundItem.findByIdAndUpdate(foundItem._id, { status: 'matched' });
-      const firstOwner = matches[0]?.found;
-      if (firstOwner?.contact_email) {
-        await sendEmail({
-          to: firstOwner.contact_email,
-          subject: 'GOD\'S EYE: Possible Match Found',
-          text: `Someone reported a found item that may match your listing: ${firstOwner.item_name}.`
+      
+      // Notify potential owners about matches
+      const topMatches = matches.slice(0, 3);
+      for (const match of topMatches) {
+        await Notification.create({
+          user_id: match.user_id,
+          title: 'Possible Match For Your Item!',
+          message: `Someone reported finding an item that matches your lost "${match.item_name}". Quality: ${match.matchQuality}`,
+          item_type: 'lost',
+          item_id: match._id
         });
+
+        if (match.contact_email) {
+          await sendEmail({
+            to: match.contact_email,
+            subject: 'GOD\'S EYE: Possible Match Found for Your Lost Item',
+            text: `Someone found an item matching your lost item: "${match.item_name}". Check the app for details!`
+          });
+        }
       }
+
+      logger.info('Found item reported with matches', {
+        itemId: foundItem._id,
+        matchCount: matches.length,
+        userId: req.user._id
+      });
     }
 
-    return res.status(201).json({
-      message: matches.length ? 'Possible Match Found' : 'Found item reported successfully',
+    return sendSuccess(res, {
       item: foundItem,
       matches
-    });
+    }, matches.length > 0 ? `Found item reported! ${matches.length} potential owner(s) notified.` : 'Found item reported successfully', 201);
   } catch (error) {
+    logger.error('Error reporting found item', { userId: req.user._id, error: error.message });
     return next(error);
   }
 };
 
 const getLostItems = async (req, res, next) => {
   try {
-    const items = await LostItem.find().sort({ createdAt: -1 }).limit(200);
-    return res.json(items);
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(50, parseInt(req.query.limit) || 20);
+    const skip = (page - 1) * limit;
+
+    const [items, total] = await Promise.all([
+      LostItem.find({ flagged_fake: { $ne: true } })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      LostItem.countDocuments({ flagged_fake: { $ne: true } })
+    ]);
+
+    return sendPaginated(res, items, total, page, limit);
   } catch (error) {
     return next(error);
   }
@@ -122,8 +168,19 @@ const getLostItems = async (req, res, next) => {
 
 const getFoundItems = async (req, res, next) => {
   try {
-    const items = await FoundItem.find().sort({ createdAt: -1 }).limit(200);
-    return res.json(items);
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(50, parseInt(req.query.limit) || 20);
+    const skip = (page - 1) * limit;
+
+    const [items, total] = await Promise.all([
+      FoundItem.find({ flagged_fake: { $ne: true } })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      FoundItem.countDocuments({ flagged_fake: { $ne: true } })
+    ]);
+
+    return sendPaginated(res, items, total, page, limit);
   } catch (error) {
     return next(error);
   }
@@ -132,9 +189,11 @@ const getFoundItems = async (req, res, next) => {
 const getItemById = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const item = (await LostItem.findById(id)) || (await FoundItem.findById(id));
-    if (!item) return res.status(404).json({ message: 'Item not found' });
-    return res.json(item);
+    const item = (await LostItem.findById(id).populate('user_id', 'name email phone')) 
+              || (await FoundItem.findById(id).populate('user_id', 'name email phone'));
+    
+    if (!item) return sendError(res, 'Item not found', 404);
+    return sendSuccess(res, item, 'Item retrieved successfully');
   } catch (error) {
     return next(error);
   }
@@ -142,11 +201,13 @@ const getItemById = async (req, res, next) => {
 
 const searchItems = async (req, res, next) => {
   try {
-    const { item_name, category, location, date } = req.query;
+    const { item_name, category, location, date, page = 1, limit = 20 } = req.query;
 
     const buildRegex = (value) => (value ? { $regex: value, $options: 'i' } : null);
 
     const lostQuery = {
+      flagged_fake: { $ne: true },
+      status: { $ne: 'returned' },
       ...(item_name ? { item_name: buildRegex(item_name) } : {}),
       ...(category ? { category } : {}),
       ...(location ? { location_lost: buildRegex(location) } : {}),
@@ -154,18 +215,45 @@ const searchItems = async (req, res, next) => {
     };
 
     const foundQuery = {
+      flagged_fake: { $ne: true },
+      status: { $ne: 'returned' },
       ...(item_name ? { item_name: buildRegex(item_name) } : {}),
       ...(category ? { category } : {}),
       ...(location ? { location_found: buildRegex(location) } : {}),
       ...(date ? { date_found: { $gte: new Date(date) } } : {})
     };
 
-    const [lostItems, foundItems] = await Promise.all([
-      LostItem.find(lostQuery).limit(100),
-      FoundItem.find(foundQuery).limit(100)
+    const pageNum = Math.max(1, parseInt(page));
+    const limitNum = Math.min(50, parseInt(limit) || 20);
+    const skip = (pageNum - 1) * limitNum;
+
+    const [lostItems, foundItems, lostCount, foundCount] = await Promise.all([
+      LostItem.find(lostQuery).sort({ createdAt: -1 }).skip(skip).limit(limitNum),
+      FoundItem.find(foundQuery).sort({ createdAt: -1 }).skip(skip).limit(limitNum),
+      LostItem.countDocuments(lostQuery),
+      FoundItem.countDocuments(foundQuery)
     ]);
 
-    return res.json({ lostItems, foundItems });
+    return sendSuccess(res, {
+      lostItems: {
+        items: lostItems,
+        pagination: {
+          total: lostCount,
+          page: pageNum,
+          limit: limitNum,
+          pages: Math.ceil(lostCount / limitNum)
+        }
+      },
+      foundItems: {
+        items: foundItems,
+        pagination: {
+          total: foundCount,
+          page: pageNum,
+          limit: limitNum,
+          pages: Math.ceil(foundCount / limitNum)
+        }
+      }
+    }, 'Search results retrieved');
   } catch (error) {
     return next(error);
   }
@@ -177,13 +265,13 @@ const updateItem = async (req, res, next) => {
     const Model = type === 'found' ? FoundItem : LostItem;
     const item = await Model.findById(id);
 
-    if (!item) return res.status(404).json({ message: 'Item not found' });
+    if (!item) return sendError(res, 'Item not found', 404);
     if (item.user_id.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
-      return res.status(403).json({ message: 'Not allowed' });
+      return sendError(res, 'Not authorized to update this item', 403);
     }
 
-    const updated = await Model.findByIdAndUpdate(id, req.body, { new: true });
-    return res.json({ message: 'Item updated', item: updated });
+    const updated = await Model.findByIdAndUpdate(id, req.body, { new: true, runValidators: true });
+    return sendSuccess(res, updated, 'Item updated successfully');
   } catch (error) {
     return next(error);
   }
@@ -195,13 +283,14 @@ const deleteItem = async (req, res, next) => {
     const Model = type === 'found' ? FoundItem : LostItem;
     const item = await Model.findById(id);
 
-    if (!item) return res.status(404).json({ message: 'Item not found' });
+    if (!item) return sendError(res, 'Item not found', 404);
     if (item.user_id.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
-      return res.status(403).json({ message: 'Not allowed' });
+      return sendError(res, 'Not authorized to delete this item', 403);
     }
 
     await Model.findByIdAndDelete(id);
-    return res.json({ message: 'Item deleted' });
+    logger.info('Item deleted', { itemId: id, userId: req.user._id });
+    return sendSuccess(res, {}, 'Item deleted successfully');
   } catch (error) {
     return next(error);
   }
@@ -209,12 +298,21 @@ const deleteItem = async (req, res, next) => {
 
 const myPosts = async (req, res, next) => {
   try {
-    const [lostItems, foundItems] = await Promise.all([
-      LostItem.find({ user_id: req.user._id }).sort({ createdAt: -1 }),
-      FoundItem.find({ user_id: req.user._id }).sort({ createdAt: -1 })
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(50, parseInt(req.query.limit) || 10);
+    const skip = (page - 1) * limit;
+
+    const [lostItems, foundItems, lostCount, foundCount] = await Promise.all([
+      LostItem.find({ user_id: req.user._id }).sort({ createdAt: -1 }).skip(skip).limit(limit),
+      FoundItem.find({ user_id: req.user._id }).sort({ createdAt: -1 }).skip(skip).limit(limit),
+      LostItem.countDocuments({ user_id: req.user._id }),
+      FoundItem.countDocuments({ user_id: req.user._id })
     ]);
 
-    return res.json({ lostItems, foundItems });
+    return sendSuccess(res, {
+      lostItems: { items: lostItems, count: lostCount },
+      foundItems: { items: foundItems, count: foundCount }
+    }, 'User posts retrieved');
   } catch (error) {
     return next(error);
   }
@@ -226,15 +324,16 @@ const markReturned = async (req, res, next) => {
     const Model = type === 'found' ? FoundItem : LostItem;
     const item = await Model.findById(id);
 
-    if (!item) return res.status(404).json({ message: 'Item not found' });
+    if (!item) return sendError(res, 'Item not found', 404);
     if (item.user_id.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
-      return res.status(403).json({ message: 'Not allowed' });
+      return sendError(res, 'Not authorized', 403);
     }
 
     item.status = 'returned';
     await item.save();
-
-    return res.json({ message: 'Item marked as returned', item });
+    
+    logger.info('Item marked as returned', { itemId: id, userId: req.user._id });
+    return sendSuccess(res, item, 'Item marked as returned successfully');
   } catch (error) {
     return next(error);
   }
@@ -246,12 +345,13 @@ const reportFake = async (req, res, next) => {
     const Model = type === 'found' ? FoundItem : LostItem;
     const item = await Model.findById(id);
 
-    if (!item) return res.status(404).json({ message: 'Item not found' });
+    if (!item) return sendError(res, 'Item not found', 404);
 
     item.flagged_fake = true;
     await item.save();
 
-    return res.json({ message: 'Listing reported for review' });
+    logger.warn('Item flagged as fake', { itemId: id, reportedBy: req.user._id });
+    return sendSuccess(res, {}, 'Listing has been reported and will be reviewed');
   } catch (error) {
     return next(error);
   }
@@ -259,8 +359,19 @@ const reportFake = async (req, res, next) => {
 
 const getNotifications = async (req, res, next) => {
   try {
-    const notifications = await Notification.find({ user_id: req.user._id }).sort({ createdAt: -1 });
-    return res.json(notifications);
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(50, parseInt(req.query.limit) || 10);
+    const skip = (page - 1) * limit;
+
+    const [notifications, total] = await Promise.all([
+      Notification.find({ user_id: req.user._id })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      Notification.countDocuments({ user_id: req.user._id })
+    ]);
+
+    return sendPaginated(res, notifications, total, page, limit, 'Notifications retrieved');
   } catch (error) {
     return next(error);
   }
